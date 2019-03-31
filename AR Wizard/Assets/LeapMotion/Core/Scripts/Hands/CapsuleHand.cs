@@ -10,6 +10,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
@@ -194,7 +195,56 @@ namespace Leap.Unity {
       //Draw the rest of the hand
       drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
       drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+
+      if (counter++ >= 5)
+      {
+          WriteOutData(_hand);
+          counter = 0;
+      }
     }
+
+    private void WriteOutData(Hand hand)
+    {
+        List<Data> data = new List<Data>();
+        //Palm
+        data.Add(new Data { Description = "Palm Position X", data = hand.PalmPosition.x});
+        data.Add(new Data { Description = "Palm Position Y", data = hand.PalmPosition.y });
+        data.Add(new Data { Description = "Palm Position Z", data = hand.PalmPosition.z });
+        data.Add(new Data { Description = "Palm Position Yaw", data = hand.PalmPosition.Yaw });
+        data.Add(new Data { Description = "Palm Position Pitch", data = hand.PalmPosition.Pitch });
+        data.Add(new Data { Description = "Palm Position Roll", data = hand.PalmPosition.Roll });
+        data.Add(new Data { Description = "Palm Position Sphere radius", data =  _palmRadius * transform.lossyScale.x});
+
+        //Wrist
+        data.Add(new Data { Description = "Wrist Position X", data = hand.WristPosition.x });
+        data.Add(new Data { Description = "Wrist Position Y", data = hand.WristPosition.y });
+        data.Add(new Data { Description = "Wrist Position Z", data = hand.WristPosition.z });
+        data.Add(new Data { Description = "Wrist Position Yaw", data = hand.WristPosition.Yaw });
+        data.Add(new Data { Description = "Wrist Position Pitch", data = hand.WristPosition.Pitch });
+        data.Add(new Data { Description = "Wrist Position Roll", data = hand.WristPosition.Roll });
+
+        //Fingers
+        foreach (var handFinger in hand.Fingers)
+        {
+            foreach (var bone in handFinger.bones)
+            {
+                data.Add(new Data { Description = $"Finger: {handFinger.Id}, Bone: {bone.Type}, X", data = bone.NextJoint.x });
+                data.Add(new Data { Description = $"Finger: {handFinger.Id}, Bone: {bone.Type}, Y", data = bone.NextJoint.y });
+                data.Add(new Data { Description = $"Finger: {handFinger.Id}, Bone: {bone.Type}, Z", data = bone.NextJoint.z });
+                data.Add(new Data { Description = $"Finger: {handFinger.Id}, Bone: {bone.Type}, Yaw", data = bone.NextJoint.Yaw });
+                data.Add(new Data { Description = $"Finger: {handFinger.Id}, Bone: {bone.Type}, Pitch", data = bone.NextJoint.Pitch });
+                data.Add(new Data { Description = $"Finger: {handFinger.Id}, Bone: {bone.Type}, Roll", data = bone.NextJoint.Roll });
+                data.Add(new Data { Description = $"Palm Dist To Finger: {handFinger.Id}, Bone: {bone.Type}", data = hand.PalmPosition.DistanceTo(bone.NextJoint)});
+            }
+        }
+
+        foreach (var d in data)
+        {
+            File.AppendAllLines("some path", new[] { $"{d.data}" });
+        }
+    }
+
+
 
     private void drawSphere(Vector3 position) {
       drawSphere(position, _jointRadius);
@@ -235,6 +285,8 @@ namespace Leap.Unity {
     }
 
     private Dictionary<int, Mesh> _meshMap = new Dictionary<int, Mesh>();
+    private int counter = 0;
+
     private Mesh getCylinderMesh(float length) {
       int lengthKey = Mathf.RoundToInt(length * 100 / CYLINDER_MESH_RESOLUTION);
 
@@ -289,4 +341,16 @@ namespace Leap.Unity {
       return mesh;
     }
   }
+
+  public class Data
+  {
+        public string Description { get; set; }
+        public double data { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Description}: {data}";
+        }
+  }
+
 }
