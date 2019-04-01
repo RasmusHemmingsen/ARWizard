@@ -7,9 +7,11 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
@@ -60,7 +62,15 @@ namespace Leap.Unity {
     private Hand _hand;
     private Vector3[] _spherePositions;
 
-    public override ModelType HandModelType {
+    private Dictionary<int, Mesh> _meshMap = new Dictionary<int, Mesh>();
+    private int _counterFrameRate = 0;
+    private int _counterWriteToCsv = 0;
+    private const int GESTURE_ITERATION = 30;
+    private readonly List<string> _dataDescription = new List<string>();
+    private readonly List<float> _data = new List<float>();
+    private static bool _onlyOnce;
+
+        public override ModelType HandModelType {
       get {
         return ModelType.Graphics;
       }
@@ -89,6 +99,7 @@ namespace Leap.Unity {
       if (_material != null) {
         _sphereMat = new Material(_material);
         _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
+        InitCsv(_hand);
       }
     }
 
@@ -106,6 +117,46 @@ namespace Leap.Unity {
         _sphereMat.color = _rightColorList[_rightColorIndex];
         _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
       }
+    }
+
+    private void InitCsv(Hand hand)
+    {
+        if (_onlyOnce) return;
+        _onlyOnce = true;
+
+        Debug.Log("Writing Description to file");
+        for (int i = 0; i < GESTURE_ITERATION; i++)
+        {
+            _dataDescription.Add($"{i}. Palm Position X");
+            _dataDescription.Add($"{i}. Palm Position Y");
+            _dataDescription.Add($"{i}. Palm Position Z");
+            _dataDescription.Add($"{i}. Palm Position Yaw");
+            _dataDescription.Add($"{i}. Palm Position Pitch");
+            _dataDescription.Add($"{i}. Palm Position Roll");
+            _dataDescription.Add($"{i}. Wrist Position X");
+            _dataDescription.Add($"{i}. Wrist Position Y");
+            _dataDescription.Add($"{i}. Wrist Position Z");
+            _dataDescription.Add($"{i}. Wrist Position Yaw");
+            _dataDescription.Add($"{i}. Wrist Position Pitch");
+            _dataDescription.Add($"{i}. Wrist Position Roll");
+
+            foreach (var handFinger in hand.Fingers)
+            {
+                foreach (var bone in handFinger.bones)
+                {
+                    _dataDescription.Add($"{i}. Finger: {handFinger.Id} Bone: {bone.Type} X");
+                    _dataDescription.Add($"{i}. Finger: {handFinger.Id} Bone: {bone.Type} Y");
+                    _dataDescription.Add($"{i}. Finger: {handFinger.Id} Bone: {bone.Type} Z");
+                    _dataDescription.Add($"{i}. Finger: {handFinger.Id} Bone: {bone.Type} Yaw");
+                    _dataDescription.Add($"{i}. Finger: {handFinger.Id} Bone: {bone.Type} Pitch");
+                    _dataDescription.Add($"{i}. Finger: {handFinger.Id} Bone: {bone.Type} Roll");
+                    _dataDescription.Add($"{i}. Palm Dist To Finger: {handFinger.Id} Bone: {bone.Type}");
+                }
+            }
+            }
+
+        File.AppendAllLines("HandGestureData.csv", new [] {string.Join(",", _dataDescription) });
+
     }
 
     public override void UpdateHand() {
@@ -194,7 +245,63 @@ namespace Leap.Unity {
       //Draw the rest of the hand
       drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
       drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+
+      if (_counterFrameRate++ >= 5)
+      {
+          ExtractHandData(_hand);
+          _counterFrameRate = 0;
+          if (++_counterWriteToCsv >= GESTURE_ITERATION)
+          {
+              WriteDataToCsv();
+              _data.RemoveRange(0, _dataDescription.Count/3);
+              _counterWriteToCsv = 20;
+          }
+      }
     }
+
+    private void WriteDataToCsv()
+    {
+        Debug.Log("Writing Data to file");
+        File.AppendAllLines("HandGestureData.csv", new [] { string.Join(",", _data) });
+    }
+
+    private void ExtractHandData(Hand hand)
+    {
+        //Palm
+        _data.Add(hand.PalmPosition.x);
+        _data.Add(hand.PalmPosition.y);
+        _data.Add(hand.PalmPosition.z);
+        _data.Add(hand.PalmPosition.Yaw);
+        _data.Add(hand.PalmPosition.Pitch);
+        _data.Add(hand.PalmPosition.Roll);
+
+        //Wrist
+        _data.Add(hand.WristPosition.x);
+        _data.Add(hand.WristPosition.y);
+        _data.Add(hand.WristPosition.z);
+        _data.Add(hand.WristPosition.Yaw);
+        _data.Add(hand.WristPosition.Pitch);
+        _data.Add(hand.WristPosition.Roll);
+
+
+
+        //Fingers
+        foreach (var handFinger in hand.Fingers)
+        {
+            foreach (var bone in handFinger.bones)
+            {
+                _data.Add(bone.NextJoint.x);
+                _data.Add(bone.NextJoint.y);
+                _data.Add(bone.NextJoint.z);
+                _data.Add(bone.NextJoint.Yaw);
+                _data.Add(bone.NextJoint.Pitch);
+                _data.Add(bone.NextJoint.Roll);
+                _data.Add(hand.PalmPosition.DistanceTo(bone.NextJoint));
+            }
+        }
+    }
+
+
 
     private void drawSphere(Vector3 position) {
       drawSphere(position, _jointRadius);
@@ -234,7 +341,6 @@ namespace Leap.Unity {
       return fingerIndex * 4 + jointIndex;
     }
 
-    private Dictionary<int, Mesh> _meshMap = new Dictionary<int, Mesh>();
     private Mesh getCylinderMesh(float length) {
       int lengthKey = Mathf.RoundToInt(length * 100 / CYLINDER_MESH_RESOLUTION);
 
@@ -289,4 +395,16 @@ namespace Leap.Unity {
       return mesh;
     }
   }
+
+  public class Data
+  {
+        public string Description { get; set; }
+        public double data { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Description}: {data}";
+        }
+  }
+
 }
