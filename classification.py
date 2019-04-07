@@ -5,14 +5,14 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import add_dummy_feature
 from sklearn.metrics import accuracy_score
+import pickle
 
 #Load the provided data from .mat files
 def loadData():
-    #df = pd.read_csv(r"C:\Users\Nicklas\Dropbox\Computer Teknologi\CT 3. Semester\HandGestureDataGestureTogether.csv")
-    train_data = np.genfromtxt(r"C:\Users\Nicklas\Dropbox\Computer Teknologi\CT 3. Semester\HandGestureDataGestureTogetherNoHead.csv", delimiter=',')
+    train_data = pd.read_csv(r"C:\Users\Nicklas\Dropbox\Computer Teknologi\CT 3. Semester\HandGestureDataGestureTogether.csv")
     train_label = np.array([0]*103 + [1]*98 + [2]*106)
 
-    test_data = np.genfromtxt(r"C:\Users\Nicklas\Dropbox\Computer Teknologi\CT 3. Semester\HandGestureTestSetAndersNoHead.csv", delimiter=',')
+    test_data = pd.read_csv(r"C:\Users\Nicklas\Dropbox\Computer Teknologi\CT 3. Semester\HandGestureTestSetAnders.csv")
     test_label = np.array([0]*9 + [1]*9 + [2]*10)
 
     return train_data, train_label, test_data, test_label
@@ -212,30 +212,33 @@ def perceptron_classify(W, test_data, test_lbls):
 #load data
 train_data, train_label, test_data, test_label = loadData()
 
-nc = NC()
-nsc = NSC(subclass_count=2)
-nn = NN()
-bp = BP_Perceptron()
+# nc = NC()
+# nsc = NSC(subclass_count=2)
+# nn = NN()
+# bp = BP_Perceptron()
 mse = MSE_Perceptron()
 
 #data classification
-nc.fit(train_data, train_label)
-nc_classification, nc_score = nc.predict(test_data, test_label)
+# nc.fit(train_data, train_label)
+# nc_classification, nc_score = nc.predict(test_data, test_label)
 
-nsc.fit(train_data, train_label)
-nsc_classification, nsc_score = nsc.predict(test_data, test_label)
+# nsc.fit(train_data, train_label)
+# nsc_classification, nsc_score = nsc.predict(test_data, test_label)
 
-nn.fit(train_data, train_label)
-nn_classification, nn_score = nn.predict(test_data, test_label)
+# nn.fit(train_data, train_label)
+# nn_classification, nn_score = nn.predict(test_data, test_label)
 
-bp.fit(train_data, train_label)
-bp_classification, bp_score = bp.predict(test_data, test_label)
+# bp.fit(train_data, train_label)
+# bp_classification, bp_score = bp.predict(test_data, test_label)
 
 mse.fit(train_data, train_label, 100)
 mse_classification, mse_score = mse.predict(test_data, test_label)
 
-print(f"NC classification = {nc_classification}, Score = {nc_score}")
-print(f"NSC classification = {nsc_classification}, Score = {nsc_score}")
-print(f"NN classification = {nn_classification}, Score = {nn_score}")
-print(f"BP classification = {bp_classification}, Score = {bp_score}")
+# print(f"NC classification = {nc_classification}, Score = {nc_score}")
+# print(f"NSC classification = {nsc_classification}, Score = {nsc_score}")
+# print(f"NN classification = {nn_classification}, Score = {nn_score}")
+# print(f"BP classification = {bp_classification}, Score = {bp_score}")
 print(f"MSE classification = {mse_classification}, Score = {mse_score}")
+
+filename = 'hejmeddig.sav'
+pickle.dump(mse, open(filename, 'wb'))

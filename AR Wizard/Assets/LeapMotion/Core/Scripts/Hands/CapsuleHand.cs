@@ -9,10 +9,12 @@
 
 using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Leap.Unity.Attributes;
+using Debug = UnityEngine.Debug;
 
 namespace Leap.Unity {
   /** A basic Leap hand model constructed dynamically vs. using pre-existing geometry*/
@@ -156,10 +158,9 @@ namespace Leap.Unity {
             }
 
         File.AppendAllLines("HandGestureData.csv", new [] {string.Join(",", _dataDescription) });
-
     }
 
-    public override void UpdateHand() {
+    public override async void UpdateHand() {
       if (_spherePositions == null || _spherePositions.Length != TOTAL_JOINT_COUNT) {
         _spherePositions = new Vector3[TOTAL_JOINT_COUNT];
       }
@@ -255,6 +256,23 @@ namespace Leap.Unity {
               WriteDataToCsv();
               _data.RemoveRange(0, _dataDescription.Count/3);
               _counterWriteToCsv = 20;
+          }
+      }
+
+
+      var start = new ProcessStartInfo
+      {
+          FileName = @"C:\Users\Nicklas\AppData\Local\Programs\Python\Python37\python.exe",
+          Arguments = string.Format("{0} {1}", @"C:\Users\Nicklas\Desktop\Source\ARWizard\classification.py", ""),
+          UseShellExecute = false,
+          RedirectStandardOutput = true
+      };
+      using (var process = Process.Start(start))
+      {
+          using (StreamReader reader = process.StandardOutput)
+          {
+              string result = reader.ReadToEnd();
+              Debug.Log(result);
           }
       }
     }
