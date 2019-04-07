@@ -14,6 +14,9 @@ using Debug = UnityEngine.Debug;
 
 public class HandThroughLeap : MonoBehaviour
 {
+    public bool TrainData = false;
+    public string TrainGestureName;
+
     private Controller _controller;
     private Frame _frame;
     private readonly List<string> _dataDescription = new List<string>();
@@ -22,7 +25,6 @@ public class HandThroughLeap : MonoBehaviour
     private const int GESTURE_ITERATION = 30;
     private int _counterFrameRate;
     private int _counterWriteToCsv;
-    public bool TrainData = false;
     private HttpClient _client;
 
     // Start is called before the first frame update
@@ -49,12 +51,14 @@ public class HandThroughLeap : MonoBehaviour
                 if (TrainData)
                 {
                     WriteDataToCsv();
-                    return;
                 }
                 var json = JsonConvert.SerializeObject(_data);
                 var content = new StringContent(json);
                 _data.RemoveRange(0, _data.Count / 3);
                 _counterWriteToCsv = 20;
+
+                if (TrainData) return;
+
                 var response = await _client.PostAsync("/postjson", content);
                 var result = await response.Content.ReadAsStringAsync();
                 Debug.Log(result);
@@ -134,12 +138,12 @@ public class HandThroughLeap : MonoBehaviour
             }
         }
 
-        File.AppendAllLines("HandGestureData.csv", new[] { string.Join(",", _dataDescription) });
+        File.AppendAllLines($"Assets\\TrainingData\\{TrainGestureName}.csv", new[] { string.Join(",", _dataDescription) });
     }
 
     private void WriteDataToCsv()
     {
         Debug.Log("Writing Data to file");
-        File.AppendAllLines("HandGestureData.csv", new[] { string.Join(",", _data) });
+        File.AppendAllLines($"Assets\\TrainingData\\{TrainGestureName}.csv", new[] { string.Join(",", _data) });
     }
 }
