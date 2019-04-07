@@ -46,7 +46,7 @@ def perceptron_classify(W, test_data):
     return np.argmax(decision,axis=0)
 
 
-filename = r'C:\Users\Nicklas\Desktop\Source\ARWizard\hejmeddig.sav'
+filename = r'modelv2.sav'
 mse = pickle.load(open(filename, 'rb'))
 
 @app.route('/postjson', methods=['POST'])

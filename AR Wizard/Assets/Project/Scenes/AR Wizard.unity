@@ -304,7 +304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb4d28ef5e6c6e34298cedf42708ea47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TrainData: 1
+  TrainData: 0
   TrainGestureName: Jedi_Trick_Right_Hand
 --- !u!1001 &1783397866
 PrefabInstance:
