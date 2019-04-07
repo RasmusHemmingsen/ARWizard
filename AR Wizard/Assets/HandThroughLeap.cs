@@ -1,8 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Leap;
+using LeapInternal;
+using Newtonsoft.Json;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class HandThroughLeap : MonoBehaviour
 {
@@ -14,16 +22,19 @@ public class HandThroughLeap : MonoBehaviour
     private const int GESTURE_ITERATION = 30;
     private int _counterFrameRate;
     private int _counterWriteToCsv;
-    private const bool WRITE_DATA_TO_FILE = true;
+    public bool TrainData = false;
+    private HttpClient _client;
 
     // Start is called before the first frame update
     void Start()
     {
         _controller = new Controller();
+        _client = new HttpClient();
+        _client.BaseAddress = new Uri("http://localhost:5000");
     }
 
     // Update is called once per frame
-    void Update()
+    async void Update()
     {
         _frame = _controller.Frame();
         if (_counterFrameRate++ >= 5)
@@ -35,9 +46,18 @@ public class HandThroughLeap : MonoBehaviour
             _counterFrameRate = 0;
             if (++_counterWriteToCsv >= GESTURE_ITERATION)
             {
-                if (WRITE_DATA_TO_FILE) { WriteDataToCsv(); }
+                if (TrainData)
+                {
+                    WriteDataToCsv();
+                    return;
+                }
+                var json = JsonConvert.SerializeObject(_data);
+                var content = new StringContent(json);
                 _data.RemoveRange(0, _data.Count / 3);
                 _counterWriteToCsv = 20;
+                var response = await _client.PostAsync("/postjson", content);
+                var result = await response.Content.ReadAsStringAsync();
+                Debug.Log(result);
             }
         }
     }
