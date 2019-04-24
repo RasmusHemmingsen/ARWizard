@@ -26,6 +26,9 @@ public class Gesture
 
 public class MainGameManager : MonoBehaviour
 {
+    [Range(0f, 100f)]
+    public float percentage = 80f;
+
     [SerializeField]
     private string targetNameInHieracy;
 
@@ -62,7 +65,7 @@ public class MainGameManager : MonoBehaviour
             while (targetHand != null)
             {
                 previousPositions.Enqueue(targetHand.transform.position);
-                if(previousPositions.Count > 10)
+                if (previousPositions.Count > 10)
                 {
                     previousPositions.Dequeue();
                 }
@@ -82,12 +85,17 @@ public class MainGameManager : MonoBehaviour
 
     private void OnEvent(Gesture g)
     {
+        if (g.Percentage < percentage)
+            return;
         switch (g.Type)
         {
             case GestureType.Fireball:
                 {
-                    activeSpell = GestureType.Fireball;
-                    ChannelFireball();
+                    if (activeSpell != GestureType.Fireball)
+                    {
+                        activeSpell = GestureType.Fireball;
+                        ChannelFireball();
+                    }
                     break;
                 }
             case GestureType.Frostball:
@@ -127,6 +135,7 @@ public class MainGameManager : MonoBehaviour
 
         var fireball = Instantiate(fireballPrefab);
         fireball.transform.position = targetHand.transform.position;
-        fireball.GetComponent<Fireball>().Shoot((targetHand.transform.position-previousPositions.Peek()));
+        fireball.GetComponent<Fireball>().Shoot((targetHand.transform.position - previousPositions.Peek()));
+        activeSpell = GestureType.Nothing;
     }
 }
