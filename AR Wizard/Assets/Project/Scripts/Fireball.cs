@@ -5,22 +5,34 @@ using UnityEngine;
 public class Fireball : MonoBehaviour
 {
     public ParticleSystem FireballEffect, ExplosionEffect, SteamEffect;
-    public Transform Hand;
 
     private bool isBeingConjured = true;
 
     void Start()
     {
+        StartCoroutine(StartFireball());
+    }
+
+    private IEnumerator StartFireball()
+    {
         FireballEffect.Stop();
         ExplosionEffect.Stop();
+        SteamEffect.Play();
+        yield return new WaitForSeconds(0.5f);
+        FireballEffect.Play();
+        yield return new WaitForSeconds(3f);
+        FireballEffect.Stop();
         SteamEffect.Stop();
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        ExplosionEffect.Play();
+        yield return null;
     }
 
     private void Update()
     {
         if (isBeingConjured)
         {
-            transform.position = Vector3.Lerp(transform.position, new Vector3(Hand.position.x, Hand.position.y, Hand.position.z - 1), Time.deltaTime * 50);
+            //transform.position = Vector3.Lerp(transform.position, new Vector3(Hand.position.x, Hand.position.y, Hand.position.z - 1), Time.deltaTime * 50);
         }
     }
 
@@ -43,12 +55,14 @@ public class Fireball : MonoBehaviour
         ExplosionEffect.Play();
     }
 
-    public void Shoot()
+    public void Shoot(Vector3 direction)
     {
         isBeingConjured = false;
-        GetComponent<Rigidbody>().AddForce(-Hand.forward * 1000);
-        GetComponent<Rigidbody>().useGravity = true;
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().AddForce(direction.normalized * 5000);
     }
+
+
 
     private IEnumerator GraduallyTurnDownEffect(float duration, ParticleSystem ps)
     {
