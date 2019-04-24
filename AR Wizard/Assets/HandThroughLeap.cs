@@ -75,10 +75,11 @@ public class HandThroughLeap : MonoBehaviour
 
                 var response = await _client.PostAsync("/postjson", content);
                 var result = await response.Content.ReadAsStringAsync();
+                var gesture = JsonConvert.DeserializeObject<Gesture>(result);
 
                 // raise event with result
                 Debug.Log(result);
-                HandGesturePercentageEvent(new Gesture(result, 100f));
+                HandGesturePercentageEvent(gesture);
             }
         }
     }

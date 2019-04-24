@@ -17,6 +17,8 @@ public class Gesture
     public float Percentage { get; set; }
     public GestureType Type { get; set; }
 
+    public Gesture() { }
+
     public Gesture(string name, float percentage)
     {
         Percentage = Mathf.Clamp(percentage, 0, 100);

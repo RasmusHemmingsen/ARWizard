@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 import pickle
 import numpy as np
 import pandas as pd
@@ -15,8 +16,8 @@ def loadData():
 
 class ClassificationModel:
     def __init__(self):
-        self.classification = ''
-        self.classificationPercentage = 0
+        self.Type = ''
+        self.Percentage = ''
 
 class MSE_Perceptron:
     def __init__(self):
@@ -61,8 +62,8 @@ def perceptron_classify(W, test_data) -> ClassificationModel:
     
     model = ClassificationModel()
 
-    model.classification = np.argmax(decision,axis=0)
-    model.classificationPercentage = np.take_along_axis(percentage, np.reshape(model.classification, [-1, 2]), 0)[0]
+    model.Type = str(np.argmax(decision,axis=0)[0])
+    model.Percentage = str(np.max(percentage))
 
     return model
 
@@ -75,8 +76,9 @@ mse = pickle.load(open(filename, 'rb'))
 def post():
     test_data = np.array(json.loads(request.data))
 
-    result = mse.predict(test_data)
-    print(f"{result.classification} with {result.classificationPercentage}% confidence")
-    return result
+    result = mse.predict(test_data.reshape(1,-1))
+    print(f"{result.Type} with {result.Percentage}% confidence")
+
+    return json.dumps(result.__dict__)
 
 app.run(host='0.0.0.0', port=5000)
