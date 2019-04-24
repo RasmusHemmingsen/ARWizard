@@ -49,7 +49,7 @@ public class FireballController : MonoBehaviour
                 }
             case 2:
                 {
-                    fireball.Shoot();
+                    //fireball.Shoot();
                     activeEffect++;
                     break;
                 }

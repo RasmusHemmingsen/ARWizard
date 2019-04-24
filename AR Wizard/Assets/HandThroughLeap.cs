@@ -27,7 +27,7 @@ public class HandThroughLeap : MonoBehaviour
     private int _counterWriteToCsv;
     private HttpClient _client;
 
-    public delegate void PythonEvent(string s);
+    public delegate void PythonEvent(Gesture g);
     public static event PythonEvent HandGesturePercentageEvent;
 
 
@@ -43,6 +43,15 @@ public class HandThroughLeap : MonoBehaviour
     // Update is called once per frame
     async void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HandGesturePercentageEvent(new Gesture("0", 100f));
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            HandGesturePercentageEvent(new Gesture("2", 100f));
+        }
+
         _frame = _controller.Frame();
         if (_counterFrameRate++ >= 5)
         {
@@ -69,7 +78,7 @@ public class HandThroughLeap : MonoBehaviour
 
                 // raise event with result
                 Debug.Log(result);
-                HandGesturePercentageEvent(result);
+                HandGesturePercentageEvent(new Gesture(result, 100f));
             }
         }
     }

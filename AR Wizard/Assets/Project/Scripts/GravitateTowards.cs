@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GravitateTowards : MonoBehaviour {
     [SerializeField]
-    private string targetInHieracy;
+    private string targetNameInHieracy;
     [SerializeField]
     private float maxSpeed;
 
@@ -14,7 +14,7 @@ public class GravitateTowards : MonoBehaviour {
     private Rigidbody rigidBody;
 
     void Start() {
-        targetHand = GameObject.Find(targetInHieracy);
+        targetHand = GameObject.Find(targetNameInHieracy);
         rigidBody = GetComponent<Rigidbody>();
 
         // Get interaction manager from hierachy
@@ -24,7 +24,7 @@ public class GravitateTowards : MonoBehaviour {
     void Update() {
 
         if (targetHand == null) {
-            targetHand = GameObject.Find(targetInHieracy);
+            targetHand = GameObject.Find(targetNameInHieracy);
         }
         else if (targetHand.activeInHierarchy) {
             ApplyGravityTowardsTarget();
@@ -34,7 +34,7 @@ public class GravitateTowards : MonoBehaviour {
     private void ApplyGravityTowardsTarget() {
         Vector3 direction = targetHand.transform.position - transform.position;
         
-        rigidBody.AddForce(direction.normalized * (direction.magnitude* direction.magnitude)*100);
+        rigidBody.AddForce(direction*1000);
 
         if(rigidBody.velocity.magnitude > maxSpeed) {
             rigidBody.velocity = rigidBody.velocity.normalized * maxSpeed;
