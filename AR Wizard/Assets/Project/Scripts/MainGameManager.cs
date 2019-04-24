@@ -39,8 +39,11 @@ public class MainGameManager : MonoBehaviour
     private GestureType activeSpell;
     private List<GameObject> activeParticles;
 
+    private Queue<Vector3> previousPositions;
+
     private void Awake()
     {
+        previousPositions = new Queue<Vector3>();
         activeParticles = new List<GameObject>();
         HandThroughLeap.HandGesturePercentageEvent += OnEvent;
         activeSpell = GestureType.Nothing;
@@ -48,7 +51,25 @@ public class MainGameManager : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(SavePreviousHandPos());
         targetHand = GameObject.Find(targetNameInHieracy);
+    }
+
+    IEnumerator SavePreviousHandPos()
+    {
+        while (true)
+        {
+            while (targetHand != null)
+            {
+                previousPositions.Enqueue(targetHand.transform.position);
+                if(previousPositions.Count > 10)
+                {
+                    previousPositions.Dequeue();
+                }
+                yield return new WaitForSeconds(0.05f);
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     private void Update()
@@ -75,7 +96,7 @@ public class MainGameManager : MonoBehaviour
                 }
             case GestureType.Shoot:
                 {
-                    if(activeSpell == GestureType.Fireball)
+                    if (activeSpell == GestureType.Fireball)
                     {
                         ShootFireball();
                     }
@@ -92,7 +113,7 @@ public class MainGameManager : MonoBehaviour
         {
             var particle = Instantiate(channelFireballParticlePrefab);
             activeParticles.Add(particle);
-            particle.transform.position = targetHand.transform.position + new Vector3(Random.Range(-0.05f,0.05f), Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f));
+            particle.transform.position = targetHand.transform.position + new Vector3(Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f));
         }
     }
 
@@ -106,6 +127,6 @@ public class MainGameManager : MonoBehaviour
 
         var fireball = Instantiate(fireballPrefab);
         fireball.transform.position = targetHand.transform.position;
-        fireball.GetComponent<Fireball>().Shoot(Vector3.forward);
+        fireball.GetComponent<Fireball>().Shoot((targetHand.transform.position-previousPositions.Peek()));
     }
 }

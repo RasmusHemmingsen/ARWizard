@@ -18,9 +18,9 @@ public class Fireball : MonoBehaviour
         FireballEffect.Stop();
         ExplosionEffect.Stop();
         SteamEffect.Play();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         FireballEffect.Play();
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f);
         FireballEffect.Stop();
         SteamEffect.Stop();
         GetComponent<Rigidbody>().velocity = Vector3.zero;
