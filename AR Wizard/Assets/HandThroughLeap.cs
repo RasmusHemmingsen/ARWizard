@@ -27,6 +27,11 @@ public class HandThroughLeap : MonoBehaviour
     private int _counterWriteToCsv;
     private HttpClient _client;
 
+    public delegate void PythonEvent(string s);
+    public static event PythonEvent HandGesturePercentageEvent;
+
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -61,10 +66,14 @@ public class HandThroughLeap : MonoBehaviour
 
                 var response = await _client.PostAsync("/postjson", content);
                 var result = await response.Content.ReadAsStringAsync();
+
+                // raise event with result
                 Debug.Log(result);
+                HandGesturePercentageEvent(result);
             }
         }
     }
+
 
     private void ExtractHandData(Hand hand)
     {
