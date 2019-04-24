@@ -2,9 +2,21 @@ from flask import Flask
 from flask import request
 import pickle
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import add_dummy_feature
 import json
 app = Flask(__name__)
+
+#Load the provided data from .mat files
+def loadData():
+    test_data = pd.read_csv(r"AR Wizard\Assets\TrainingData\test2.csv")
+
+    return test_data
+
+class ClassificationModel:
+    def __init__(self):
+        self.classification = ''
+        self.classificationPercentage = 0
 
 class MSE_Perceptron:
     def __init__(self):
@@ -32,10 +44,10 @@ class MSE_Perceptron:
         self.W = np.dot(B, X_pinv.transpose())
         return self
 
-    def predict(self, test_data):
+    def predict(self, test_data) -> ClassificationModel:
         return perceptron_classify(self.W, test_data)
 
-def perceptron_classify(W, test_data):
+def perceptron_classify(W, test_data) -> ClassificationModel:
     # Convert samples to float for faster numpy processing
     test_data = test_data.astype(float)
     
@@ -43,8 +55,18 @@ def perceptron_classify(W, test_data):
     X = add_dummy_feature(test_data).transpose()
 
     decision = np.dot(W,X)
-    return np.argmax(decision,axis=0)
 
+    norm = 1 + decision / np.max(np.absolute(decision),axis=0)
+    percentage = norm / sum(norm)
+    
+    model = ClassificationModel()
+
+    model.classification = np.argmax(decision,axis=0)
+    model.classificationPercentage = np.take_along_axis(percentage, np.reshape(model.classification, [-1, 2]), 0)[0]
+
+    return model
+
+#test_data = loadData()
 
 filename = r'modelv2.sav'
 mse = pickle.load(open(filename, 'rb'))
@@ -52,9 +74,9 @@ mse = pickle.load(open(filename, 'rb'))
 @app.route('/postjson', methods=['POST'])
 def post():
     test_data = np.array(json.loads(request.data))
-        
-    mse_classification = mse.predict(test_data.reshape(1,-1))
-    print(f"{mse_classification}")
-    return str(mse_classification[0])
+
+    result = mse.predict(test_data)
+    print(f"{result.classification} with {result.classificationPercentage}% confidence")
+    return result
 
 app.run(host='0.0.0.0', port=5000)
