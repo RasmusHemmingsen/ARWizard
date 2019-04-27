@@ -87,7 +87,7 @@ public class MainGameManager : MonoBehaviour
 
     private void OnEvent(Gesture g)
     {
-        if (g.Percentage < percentage)
+        if (g.Percentage*100 < percentage)
             return;
         switch (g.Type)
         {

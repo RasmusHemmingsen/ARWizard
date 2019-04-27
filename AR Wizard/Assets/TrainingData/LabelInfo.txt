@@ -1,5 +1,12 @@
+V2
 Raising 120
-Cicle 131
+Shoot 125
 Peace sign 131
-clock 130
+square - clockwise 130
+Jedi 127
+
+V3
+Raising 120
+Peace sign 131
+Shoot 125
 Jedi 127
