@@ -234,6 +234,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LoPoly Rigged Hand Right
       objectReference: {fileID: 0}
+    - target: {fileID: 1404367628755344, guid: 2276723046d707c4f94d431ceb80ab92, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4430945870454064, guid: 2276723046d707c4f94d431ceb80ab92, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -663,6 +667,18 @@ PrefabInstance:
       propertyPath: scaleLastFingerBone
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1615652463054736, guid: 2276723046d707c4f94d431ceb80ab92, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1836811614331858, guid: 2276723046d707c4f94d431ceb80ab92, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886763756238600, guid: 2276723046d707c4f94d431ceb80ab92, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2276723046d707c4f94d431ceb80ab92, type: 3}
 --- !u!1 &435763042
@@ -694,12 +710,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bce4feea755822428d380261ee62635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  percentage: 50
-  targetNameInHieracy: R_middle_a
-  concurrentParticles: 20
+  percentage: 78.2
+  targetNameInHieracy: R_Palm
+  concurrentParticles: 15
   channelFireballParticlePrefab: {fileID: 8776512172474606861, guid: e901c94e29b19d04a913b6be2e178617,
     type: 3}
   fireballPrefab: {fileID: 2883900358275107103, guid: 340e9977295c6954b9d47f846940c886,
+    type: 3}
+  channelFrostballParticlePrefab: {fileID: 8776512172474606861, guid: 529555b216be8a14c89691b4343e6d7c,
+    type: 3}
+  frostballPrefab: {fileID: 2883900358275107103, guid: 5470444df79328442b1449588ff4a70e,
+    type: 3}
+  channelGrassParticlePrefab: {fileID: 8776512172474606861, guid: 356c665d43af7844f92a65e75901f4ba,
+    type: 3}
+  grassballPrefab: {fileID: 2883900358275107103, guid: 9043a57fa111f604d9cfe8f5751b18be,
     type: 3}
 --- !u!4 &435763044
 Transform:
@@ -792,6 +816,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2083838094}
     - target: {fileID: 1394407071443026, guid: dae2e2be31c98324eac460f702db97e9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1997533534152106, guid: dae2e2be31c98324eac460f702db97e9, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}

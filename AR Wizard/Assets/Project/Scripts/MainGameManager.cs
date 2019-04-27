@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -9,7 +8,7 @@ public enum GestureType
     Fireball,
     Frostball,
     Shoot,
-    Nothing
+    Grassball
 }
 
 public class Gesture
@@ -32,10 +31,22 @@ public class Gesture
     }
 }
 
+public class Spell
+{
+    public GameObject channelPrefab { get; set; }
+    public GameObject spellPrefab { get; set; }
+
+    public Spell(GameObject channel, GameObject spell)
+    {
+        channelPrefab = channel;
+        spellPrefab = spell;
+    }
+}
+
 public class MainGameManager : MonoBehaviour
 {
-    [Range(0f, 100f)]
-    public float percentage = 80f;
+    [Range(0f, 1f)]
+    public float percentage = 0.8f;
 
     [SerializeField]
     private string targetNameInHieracy;
@@ -44,10 +55,11 @@ public class MainGameManager : MonoBehaviour
     int concurrentParticles = 20;
 
     [SerializeField]
-    GameObject channelFireballParticlePrefab, fireballPrefab;
+    GameObject channelFireballParticlePrefab, fireballPrefab, channelFrostballParticlePrefab, frostballPrefab, channelGrassParticlePrefab, grassballPrefab;
 
     private GameObject targetHand;
-    private GestureType activeSpell;
+    private bool _isSpellActive;
+    private Spell _currentSpell;
     private List<GameObject> activeParticles;
 
     private Queue<Vector3> previousPositions;
@@ -57,7 +69,7 @@ public class MainGameManager : MonoBehaviour
         previousPositions = new Queue<Vector3>();
         activeParticles = new List<GameObject>();
         HandThroughLeap.HandGesturePercentageEvent += OnEvent;
-        activeSpell = GestureType.Nothing;
+        _isSpellActive = false;
     }
 
     private void Start()
@@ -95,45 +107,20 @@ public class MainGameManager : MonoBehaviour
     {
         if (g.Percentage < percentage)
             return;
-        switch (g.Type)
+        if (_isSpellActive && g.Type == GestureType.Shoot)
         {
-            case GestureType.Fireball:
-                {
-                    if (activeSpell != GestureType.Fireball)
-                    {
-                        activeSpell = GestureType.Fireball;
-                        ChannelFireball();
-                    }
-                    break;
-                }
-            case GestureType.Frostball:
-                {
-                    break;
-                }
-            case GestureType.Shoot:
-                {
-                    if (activeSpell == GestureType.Fireball)
-                    {
-                        ShootFireball();
-                    }
-                    break;
-                }
-            default:
-                break;
+            Shoot();
+            return;
         }
+        if(_isSpellActive)
+            return;
+
+        _isSpellActive = true;
+        _currentSpell = GetSpellPrefab(g.Type);
+        ChannelSpell(_currentSpell);
     }
 
-    private void ChannelFireball()
-    {
-        for (int i = 0; i < concurrentParticles; i++)
-        {
-            var particle = Instantiate(channelFireballParticlePrefab);
-            activeParticles.Add(particle);
-            particle.transform.position = targetHand.transform.position + new Vector3(Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f));
-        }
-    }
-
-    private void ShootFireball()
+    private void Shoot()
     {
         foreach (var particle in activeParticles)
         {
@@ -141,9 +128,42 @@ public class MainGameManager : MonoBehaviour
         }
         activeParticles = new List<GameObject>();
 
-        var fireball = Instantiate(fireballPrefab);
-        fireball.transform.position = targetHand.transform.position;
-        fireball.GetComponent<Fireball>().Shoot((targetHand.transform.position - previousPositions.Peek()));
-        activeSpell = GestureType.Nothing;
+        var spellPrefab = Instantiate(_currentSpell.spellPrefab);
+        spellPrefab.transform.position = targetHand.transform.position;
+        //BallSpell.GetComponent<BallSpell>().Shoot((targetHand.transform.position - previousPositions.Peek()));
+        spellPrefab.GetComponent<BallSpell>().Shoot(-targetHand.transform.up);
+        _isSpellActive = false;
+    }
+
+    private void ChannelSpell(Spell spell)
+    {
+        for (var i = 0; i < concurrentParticles; i++)
+        {
+            var particle = Instantiate(spell.channelPrefab);
+            activeParticles.Add(particle);
+            particle.transform.position = targetHand.transform.position + new Vector3(Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f));
+        }
+    }
+
+    private Spell GetSpellPrefab(GestureType gestureType)
+    {
+        Spell spell;
+        switch (gestureType)
+        {
+            case GestureType.Fireball:
+                spell = new Spell(channelFireballParticlePrefab, fireballPrefab);
+
+                break;
+            case GestureType.Frostball:
+                spell = new Spell(channelFrostballParticlePrefab, frostballPrefab);
+                break;
+            case GestureType.Grassball:
+                spell = new Spell(channelGrassParticlePrefab, grassballPrefab);
+                break;
+            default:
+                return null;
+        }
+
+        return spell;
     }
 }
