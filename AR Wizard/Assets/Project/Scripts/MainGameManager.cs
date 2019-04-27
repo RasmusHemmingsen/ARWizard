@@ -45,7 +45,7 @@ public class Spell
 
 public class MainGameManager : MonoBehaviour
 {
-    [Range(0f, 1f)]
+    [Range(0f, 100f)]
     public float percentage = 0.8f;
 
     [SerializeField]
@@ -112,7 +112,7 @@ public class MainGameManager : MonoBehaviour
             Shoot();
             return;
         }
-        if(_isSpellActive)
+        if(_isSpellActive || g.Type == GestureType.Shoot)
             return;
 
         _isSpellActive = true;
@@ -152,7 +152,6 @@ public class MainGameManager : MonoBehaviour
         {
             case GestureType.Fireball:
                 spell = new Spell(channelFireballParticlePrefab, fireballPrefab);
-
                 break;
             case GestureType.Frostball:
                 spell = new Spell(channelFrostballParticlePrefab, frostballPrefab);
@@ -163,7 +162,6 @@ public class MainGameManager : MonoBehaviour
             default:
                 return null;
         }
-
         return spell;
     }
 }
