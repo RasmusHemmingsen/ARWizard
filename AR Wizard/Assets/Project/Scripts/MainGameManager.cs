@@ -131,9 +131,9 @@ public class MainGameManager : MonoBehaviour
         var spellPrefab = Instantiate(_currentSpell.spellPrefab);
         spellPrefab.transform.position = targetHand.transform.position;
         //BallSpell.GetComponent<BallSpell>().Shoot((targetHand.transform.position - previousPositions.Peek()));
-        var test = Quaternion.Euler(-45, 0, 0) * -targetHand.transform.up;
+        var shootingDirection = Quaternion.Euler(-45, 0, 0) * -targetHand.transform.up;
 
-        spellPrefab.GetComponent<BallSpell>().Shoot(test);
+        spellPrefab.GetComponent<BallSpell>().Shoot(shootingDirection);
         _isSpellActive = false;
     }
 
