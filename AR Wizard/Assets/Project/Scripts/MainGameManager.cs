@@ -14,7 +14,13 @@ public enum GestureType
 
 public class Gesture
 {
-    public float Percentage { get; set; }
+    private float _percentage;
+    public float Percentage
+    {
+        get => _percentage;
+        set => _percentage = value * 100;
+    }
+
     public GestureType Type { get; set; }
 
     public Gesture() { }
@@ -87,7 +93,7 @@ public class MainGameManager : MonoBehaviour
 
     private void OnEvent(Gesture g)
     {
-        if (g.Percentage*100 < percentage)
+        if (g.Percentage < percentage)
             return;
         switch (g.Type)
         {

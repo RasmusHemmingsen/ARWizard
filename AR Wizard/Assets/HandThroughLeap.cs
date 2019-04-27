@@ -78,7 +78,7 @@ public class HandThroughLeap : MonoBehaviour
                 var gesture = JsonConvert.DeserializeObject<Gesture>(result);
 
                 // raise event with result
-                Debug.Log($"{gesture.Type} : {gesture.Percentage*100}%");
+                Debug.Log($"{gesture.Type} : {gesture.Percentage}%");
                 HandGesturePercentageEvent(gesture);
             }
         }
