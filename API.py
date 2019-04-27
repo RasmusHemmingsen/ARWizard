@@ -69,7 +69,7 @@ def perceptron_classify(W, test_data) -> ClassificationModel:
 
 #test_data = loadData()
 
-filename = r'modelv2.sav'
+filename = r'modelv3.sav'
 mse = pickle.load(open(filename, 'rb'))
 
 @app.route('/postjson', methods=['POST'])

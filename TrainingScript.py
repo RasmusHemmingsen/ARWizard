@@ -9,8 +9,8 @@ import pickle
 
 #Load the provided data from .mat files
 def loadData():
-    train_data = pd.read_csv(r"AR Wizard\Assets\TrainingData\HandGestureData.csv")
-    train_label = np.array([0]*120 + [1]*131 + [2]*131 + [3]*130 + [4]*127)
+    train_data = pd.read_csv(r"AR Wizard\Assets\TrainingData\HandGestureData2.csv")
+    train_label = np.array([0]*131 + [1]*131 + [2]*125 + [3]*127)
 
     return train_data, train_label
 
@@ -59,5 +59,5 @@ mse = MSE_Perceptron()
 
 mse.fit(train_data, train_label, 100)
 
-filename = 'model.sav'
+filename = 'modelv3.sav'
 pickle.dump(mse, open(filename, 'wb'))

@@ -13,7 +13,13 @@ public enum GestureType
 
 public class Gesture
 {
-    public float Percentage { get; set; }
+    private float _percentage;
+    public float Percentage
+    {
+        get => _percentage;
+        set => _percentage = value * 100;
+    }
+
     public GestureType Type { get; set; }
 
     public Gesture() { }
