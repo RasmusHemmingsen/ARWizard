@@ -42945,7 +42945,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6ea90248045a394d86991236553505e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FireballEffect: {fileID: 3081691573010809136}
+  BallEffect: {fileID: 3081691573010809136}
   ExplosionEffect: {fileID: 3082465330707577153}
   SteamEffect: {fileID: 3081650698961304427}
 --- !u!54 &2883900358275107100

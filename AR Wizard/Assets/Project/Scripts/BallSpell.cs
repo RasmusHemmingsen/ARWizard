@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BallSpell : MonoBehaviour
 {
-    public ParticleSystem FireballEffect, ExplosionEffect, SteamEffect;
+    public ParticleSystem BallEffect, ExplosionEffect, SteamEffect;
 
     private bool isBeingConjured = true;
 
@@ -15,13 +15,13 @@ public class BallSpell : MonoBehaviour
 
     private IEnumerator StartFireball()
     {
-        FireballEffect.Stop();
+        BallEffect.Stop();
         ExplosionEffect.Stop();
         SteamEffect.Play();
         yield return new WaitForSeconds(0.3f);
-        FireballEffect.Play();
+        BallEffect.Play();
         yield return new WaitForSeconds(1.5f);
-        FireballEffect.Stop();
+        BallEffect.Stop();
         SteamEffect.Stop();
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         ExplosionEffect.Play();
@@ -41,9 +41,9 @@ public class BallSpell : MonoBehaviour
         SteamEffect.Play();
     }
 
-    public void StartFire()
+    public void StartBall()
     {
-        FireballEffect.Play();
+        BallEffect.Play();
         StartCoroutine(GraduallyTurnDownEffect(2f, SteamEffect));
     }
 
@@ -51,7 +51,7 @@ public class BallSpell : MonoBehaviour
     {
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         GetComponent<Rigidbody>().useGravity = false;
-        FireballEffect.Stop();
+        BallEffect.Stop();
         ExplosionEffect.Play();
     }
 

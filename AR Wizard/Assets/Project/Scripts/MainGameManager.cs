@@ -128,13 +128,19 @@ public class MainGameManager : MonoBehaviour
         }
         activeParticles = new List<GameObject>();
 
+        StartCoroutine(SpellEffect());
+        _isSpellActive = false;
+    }
+    IEnumerator SpellEffect()
+    {
         var spellPrefab = Instantiate(_currentSpell.spellPrefab);
         spellPrefab.transform.position = targetHand.transform.position;
-        //BallSpell.GetComponent<BallSpell>().Shoot((targetHand.transform.position - previousPositions.Peek()));
         var shootingDirection = Quaternion.Euler(-45, 0, 0) * -targetHand.transform.up;
 
         spellPrefab.GetComponent<BallSpell>().Shoot(shootingDirection);
-        _isSpellActive = false;
+
+        yield return new WaitForSeconds(5f);
+        Destroy(spellPrefab);
     }
 
     private void ChannelSpell(Spell spell)

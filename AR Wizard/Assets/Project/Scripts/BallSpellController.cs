@@ -43,7 +43,7 @@ public class BallSpellController : MonoBehaviour
                 }
             case 1:
                 {
-                    BallSpell.StartFire();
+                    BallSpell.StartBall();
                     activeEffect++;
                     break;
                 }
