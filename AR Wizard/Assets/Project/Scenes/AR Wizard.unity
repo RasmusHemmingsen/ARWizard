@@ -694,7 +694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bce4feea755822428d380261ee62635, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  percentage: 50.9
+  percentage: 50
   targetNameInHieracy: R_middle_a
   concurrentParticles: 20
   channelFireballParticlePrefab: {fileID: 8776512172474606861, guid: e901c94e29b19d04a913b6be2e178617,
@@ -913,7 +913,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TrainData: 0
-  TrainGestureName: Shoot2
+  TrainGestureName: Raise3
 --- !u!1001 &1721928571
 PrefabInstance:
   m_ObjectHideFlags: 0

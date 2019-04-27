@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,6 +27,7 @@ public class HandThroughLeap : MonoBehaviour
     private int _counterFrameRate;
     private int _counterWriteToCsv;
     private HttpClient _client;
+    private bool run = true;
 
     public delegate void PythonEvent(Gesture g);
     public static event PythonEvent HandGesturePercentageEvent;
@@ -53,37 +55,39 @@ public class HandThroughLeap : MonoBehaviour
         }
 
         _frame = _controller.Frame();
-        if (_counterFrameRate++ >= 5)
-        {
-            if (_frame.Hands.FirstOrDefault() == null) return;
+        if (!run) return;
 
-            InitCsv(_frame.Hands.First());
-            ExtractHandData(_frame.Hands.First());
-            _counterFrameRate = 0;
-            if (++_counterWriteToCsv >= GESTURE_ITERATION)
-            {
-                if (TrainData)
-                {
-                    WriteDataToCsv();
-                }
-                var json = JsonConvert.SerializeObject(_data);
-                var content = new StringContent(json);
-                _data.RemoveRange(0, _data.Count / 3);
-                _counterWriteToCsv = 20;
+        Delay();
+        if (_frame.Hands.FirstOrDefault() == null) return;
 
-                if (TrainData) return;
+        InitCsv(_frame.Hands.First());
+        ExtractHandData(_frame.Hands.First());
+        _counterFrameRate = 0;
+        if (++_counterWriteToCsv < GESTURE_ITERATION) return;
+        if (TrainData) WriteDataToCsv();
 
-                var response = await _client.PostAsync("/postjson", content);
-                var result = await response.Content.ReadAsStringAsync();
-                var gesture = JsonConvert.DeserializeObject<Gesture>(result);
+        var json = JsonConvert.SerializeObject(_data);
+        var content = new StringContent(json);
+        _data.RemoveRange(0, _data.Count / 3);
+        _counterWriteToCsv = 20;
 
-                // raise event with result
-                Debug.Log($"{gesture.Type} : {gesture.Percentage}%");
-                HandGesturePercentageEvent(gesture);
-            }
-        }
+        if (TrainData) return;
+
+        var response = await _client.PostAsync("/postjson", content);
+        var result = await response.Content.ReadAsStringAsync();
+        var gesture = JsonConvert.DeserializeObject<Gesture>(result);
+
+        // raise event with result
+        Debug.Log($"{gesture.Type} : {gesture.Percentage}%");
+        HandGesturePercentageEvent(gesture);
     }
 
+    private IEnumerator Delay()
+    {
+        run = false;
+        yield return new WaitForSeconds(0.1f);
+        run = true;
+    }
 
     private void ExtractHandData(Hand hand)
     {

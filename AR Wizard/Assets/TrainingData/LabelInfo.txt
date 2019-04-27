@@ -6,7 +6,7 @@ square - clockwise 130
 Jedi 127
 
 V3
-Raising 120
+Raising 131
 Peace sign 131
 Shoot 125
 Jedi 127
