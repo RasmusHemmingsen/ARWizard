@@ -6,9 +6,9 @@ using Random = UnityEngine.Random;
 public enum GestureType
 {
     Fireball,
-    Frostball,
+    Grassball,
     Shoot,
-    Grassball
+    Frostball,
 }
 
 public class Gesture
@@ -131,7 +131,9 @@ public class MainGameManager : MonoBehaviour
         var spellPrefab = Instantiate(_currentSpell.spellPrefab);
         spellPrefab.transform.position = targetHand.transform.position;
         //BallSpell.GetComponent<BallSpell>().Shoot((targetHand.transform.position - previousPositions.Peek()));
-        spellPrefab.GetComponent<BallSpell>().Shoot(-targetHand.transform.up);
+        var test = Quaternion.Euler(-45, 0, 0) * -targetHand.transform.up;
+
+        spellPrefab.GetComponent<BallSpell>().Shoot(test);
         _isSpellActive = false;
     }
 
