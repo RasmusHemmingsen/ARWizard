@@ -45,11 +45,19 @@ public class HandThroughLeap : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            HandGesturePercentageEvent(new Gesture("0", 100f));
+            HandGesturePercentageEvent(new Gesture("2", 100f));
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
-            HandGesturePercentageEvent(new Gesture("2", 100f));
+            HandGesturePercentageEvent(new Gesture("1", 100f));
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            HandGesturePercentageEvent(new Gesture("0", 100f));
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            HandGesturePercentageEvent(new Gesture("3", 100f));
         }
 
         _frame = _controller.Frame();
