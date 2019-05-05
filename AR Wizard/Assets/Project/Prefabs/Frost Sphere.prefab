@@ -4806,5 +4806,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b3ac65ba26382445aa82cc871d9c43b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetNameInHieracy: R_Palm
+  targetNameInHieracy: R_middle_b
   maxSpeed: 0.54

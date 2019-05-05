@@ -13,6 +13,16 @@ public class BallSpell : MonoBehaviour
         StartCoroutine(StartFireball());
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        BallEffect.Stop();
+        SteamEffect.Stop();
+        ExplosionEffect.Play();
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+        StopCoroutine(StartFireball());
+    }
+
     private IEnumerator StartFireball()
     {
         BallEffect.Stop();
