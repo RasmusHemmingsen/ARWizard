@@ -8,6 +8,8 @@ Assets/AssetStoreTools*
 #python
 __pycache__/
 
+models/*.h5
+
 # Visual Studio cache directory
 .vs/
 

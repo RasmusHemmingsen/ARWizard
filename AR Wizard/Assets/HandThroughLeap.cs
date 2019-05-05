@@ -17,6 +17,7 @@ public class HandThroughLeap : MonoBehaviour
 {
     public bool TrainData = false;
     public string TrainGestureName;
+    public string MlMethod = "mse";
 
     private Controller _controller;
     private Frame _frame;
@@ -81,7 +82,7 @@ public class HandThroughLeap : MonoBehaviour
 
         if (TrainData) return;
 
-        var response = await _client.PostAsync("/postjson", content);
+        var response = await _client.PostAsync($"/features?method={MlMethod}", content);
         var result = await response.Content.ReadAsStringAsync();
         var gesture = JsonConvert.DeserializeObject<Gesture>(result);
 
@@ -135,7 +136,7 @@ public class HandThroughLeap : MonoBehaviour
 
     private void InitCsv(Hand hand)
     {
-        if (_onlyOnce) return;
+        if (_onlyOnce || !TrainData) return;
         _onlyOnce = true;
 
         Debug.Log("Writing Description to file");

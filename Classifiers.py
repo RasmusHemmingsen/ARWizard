@@ -4,6 +4,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn import svm
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import add_dummy_feature
+import tensorflow as tf
+import pickle
 
 class ClassificationModel:
     def __init__(self):
@@ -24,8 +26,15 @@ class NC:
 
     def predict(self, test_data):
         classification = self.clf.predict(test_data)
+        percentage = 1
+        return classification, percentage
 
-        return classification
+    def save(self, version):
+        pickle.dump(self, open(f"models/ncv{version}.sav", 'wb'))
+    
+    def load(self, version):
+        self = pickle.load(open(f"models/ncv{version}.sav", 'rb'))
+        return self
 
 # Nearest Sub Centroid
 class NSC:
@@ -69,34 +78,60 @@ class NSC:
 
         # Classify samples to class with closes subclass centroid
         classification = np.argmin(distances,axis=0) + self.label_offset
+        percentage = 1
 
-        return np.asarray(classification)
+        return np.asarray(classification), percentage
+
+    def save(self, version):
+        pickle.dump(self, open(f"models/nscv{version}.sav", 'wb'))
+    
+    def load(self, version):
+        self = pickle.load(open(f"models/nscv{version}.sav", 'rb'))
+        return self
 
 # Support Vector Machine
 class SVM:
     def __init__(self):
-        self. clf = svm.SVC(gamma='scale', decision_function_shape='ovo')
+        self.clf = svm.SVC(gamma='scale', decision_function_shape='ovo', probability=True)
 
     def fit(self, train_data, train_lbls):
         self.clf.fit(train_data, train_lbls)
         return self
 
     def predict(self, test_data):
-        classification = self.clf.predict(test_data)
-        return classification
+        probabilityData = self.clf.predict_proba(test_data)
+        percentage = np.max(probabilityData, axis=1)
+        classification = np.argmax(probabilityData, axis=1)
+        return classification, percentage
+
+    def save(self, version):
+        pickle.dump(self, open(f"models/svmv{version}.sav", 'wb'))
+    
+    def load(self, version):
+        self = pickle.load(open(f"models/svmv{version}.sav", 'rb'))
+        return self
 
 #Nearest Neighbor
 class NN:
     def __init__(self):
-        self.clf = KNeighborsClassifier(weights='distance', n_jobs=-1, n_neighbors=1)
+        self.clf = KNeighborsClassifier(weights='distance', n_jobs=-1, n_neighbors=5)
 
     def fit(self, train_data, train_lbls):
         self.clf.fit(train_data, train_lbls)
         return self
 
     def predict(self, test_data):
-        classification = self.clf.predict(test_data)
-        return classification
+        probabilityData = self.clf.predict_proba(test_data)
+        percentage = np.max(probabilityData, axis=1)
+        classification = np.argmax(probabilityData, axis=1)
+        return classification, percentage
+
+    def save(self, version):
+        pickle.dump(self, open(f"models/nnv{version}.sav", 'wb'))
+    
+    def load(self, version):
+        self = pickle.load(open(f"models/nnv{version}.sav", 'rb'))
+        return self
 
 # Back Propegation Perceptron
 class BP_Perceptron:
@@ -151,6 +186,13 @@ class BP_Perceptron:
     def predict(self, test_data):
         return perceptron_classify(self.W, test_data)
 
+    def save(self, version):
+        pickle.dump(self, open(f"models/bppv{version}.sav", 'wb'))
+    
+    def load(self, version):
+        self = pickle.load(open(f"models/bppv{version}.sav", 'rb'))
+        return self
+
 # Mean-Square-Error Perceptron
 class MSE_Perceptron:
     def __init__(self):
@@ -181,6 +223,13 @@ class MSE_Perceptron:
     def predict(self, test_data):
         return perceptron_classify(self.W, test_data)
 
+    def save(self, version):
+        pickle.dump(self, open(f"models/msev{version}.sav", 'wb'))
+    
+    def load(self, version):
+        self = pickle.load(open(f"models/msev{version}.sav", 'rb'))
+        return self
+
 def perceptron_classify(W, test_data):
     # Convert samples to float for faster numpy processing
     test_data = test_data.astype(float)
@@ -195,21 +244,43 @@ def perceptron_classify(W, test_data):
 
     return classification, percentage
 
-def perceptron_classify2(W, test_data) -> ClassificationModel:
-    # Convert samples to float for faster numpy processing
-    test_data = test_data.astype(float)
-    
-    # Augment data with bias to simplify linear discriminant function
-    X = add_dummy_feature(test_data).transpose()
+#Deep neural network
+class DNN:
+    def __init__(self):
+        self.model = tf.keras.Sequential([
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(4560, activation='relu'),
+            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(2280, activation='relu'),
+            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(4560, activation='relu'),
+            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(2280, activation='relu'),
+            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(4560, activation='relu'),
+            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(4, activation='softmax')
+            ])
 
-    decision = np.dot(W,X)
 
-    norm = 1 + decision / np.max(np.absolute(decision),axis=0)
-    percentage = norm / sum(norm)
-    
-    model = ClassificationModel()
+    def fit(self, train_data, train_label, epochs):
+        self.model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
 
-    model.Type = str(np.argmax(decision,axis=0)[0])
-    model.Percentage = str(np.max(percentage))
+        self.model.fit(x=train_data, y=train_label, epochs=epochs)
+        #self.model.summary()
 
-    return model
+    def predict(self, test_data):
+        predictions = self.model.predict(test_data)
+        classification = np.argmax(predictions, axis=1)
+        confidence = np.max(predictions, axis=1)
+        
+        return classification, confidence
+
+    def save(self, version):
+        self.model.save(f"models/dnnv{version}.h5")
+
+    def load(self, version):
+        self.model = tf.keras.models.load_model(f"models/dnnv{version}.h5")
+        return self

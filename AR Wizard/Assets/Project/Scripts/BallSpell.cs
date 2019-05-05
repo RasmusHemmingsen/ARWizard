@@ -74,10 +74,10 @@ public class BallSpell : MonoBehaviour
 
     public void Shoot(Vector3 direction)
     {
-        var worldDirection = cam.ViewportToWorldPoint(direction);
+        //var worldDirection = cam.ViewportToWorldPoint(direction);
         isBeingConjured = false;
         GetComponent<Rigidbody>().useGravity = false;
-        GetComponent<Rigidbody>().AddForce(worldDirection.normalized * 5000);
+        GetComponent<Rigidbody>().AddForce(direction.normalized * 5000);
         
     }
 
