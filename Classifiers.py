@@ -190,8 +190,10 @@ def perceptron_classify(W, test_data):
 
     decision = np.dot(W,X)
     classification = np.argmax(decision,axis=0)
+    norm = 1 + decision / np.max(np.absolute(decision),axis=0)
+    percentage = np.max(norm / sum(norm), axis=0)
 
-    return classification
+    return classification, percentage
 
 def perceptron_classify2(W, test_data) -> ClassificationModel:
     # Convert samples to float for faster numpy processing
