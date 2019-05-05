@@ -18,12 +18,16 @@ public class ZombieController : MonoBehaviour
 
     public void ZombieHit()
     {
-        animator.SetTrigger("OnHit");
+        animator.ResetTrigger("Resurrect");
+        animator.SetTrigger("IsHit");
+
+        StartCoroutine(Resurrect());
     }
 
-    private void Resurrect()
+    private IEnumerator Resurrect()
     {
-        animator.ResetTrigger("OnHit");
+        yield return new WaitForSeconds(3f);
+        animator.ResetTrigger("IsHit");
         animator.SetTrigger("Resurrect");
     }
 

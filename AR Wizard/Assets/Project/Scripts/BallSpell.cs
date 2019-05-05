@@ -5,8 +5,14 @@ using UnityEngine;
 public class BallSpell : MonoBehaviour
 {
     public ParticleSystem BallEffect, ExplosionEffect, SteamEffect;
+    public Camera cam;
 
     private bool isBeingConjured = true;
+
+    void Awake()
+    {
+        cam = GameObject.Find("ARCamera").GetComponent<Camera>();
+    }
 
     void Start()
     {
@@ -15,12 +21,14 @@ public class BallSpell : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.tag != "Zombie") return;
         BallEffect.Stop();
         SteamEffect.Stop();
         ExplosionEffect.Play();
         GetComponent<Rigidbody>().velocity = Vector3.zero;
 
         StopCoroutine(StartFireball());
+
     }
 
     private IEnumerator StartFireball()
@@ -30,11 +38,10 @@ public class BallSpell : MonoBehaviour
         SteamEffect.Play();
         yield return new WaitForSeconds(0.3f);
         BallEffect.Play();
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2.7f);
         BallEffect.Stop();
         SteamEffect.Stop();
         GetComponent<Rigidbody>().velocity = Vector3.zero;
-        ExplosionEffect.Play();
         yield return null;
     }
 
@@ -67,9 +74,11 @@ public class BallSpell : MonoBehaviour
 
     public void Shoot(Vector3 direction)
     {
+        var worldDirection = cam.ViewportToWorldPoint(direction);
         isBeingConjured = false;
         GetComponent<Rigidbody>().useGravity = false;
-        GetComponent<Rigidbody>().AddForce(direction.normalized * 5000);
+        GetComponent<Rigidbody>().AddForce(worldDirection.normalized * 5000);
+        
     }
 
 

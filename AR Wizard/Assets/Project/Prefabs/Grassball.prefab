@@ -38157,6 +38157,7 @@ GameObject:
   - component: {fileID: 2883900358275107101}
   - component: {fileID: 2883900358275107102}
   - component: {fileID: 2883900358275107100}
+  - component: {fileID: 7924620117036870708}
   m_Layer: 0
   m_Name: Grassball
   m_TagString: Untagged
@@ -38196,6 +38197,7 @@ MonoBehaviour:
   BallEffect: {fileID: 3081691573010809136}
   ExplosionEffect: {fileID: 3082465330707577153}
   SteamEffect: {fileID: 3768749225122947631}
+  cam: {fileID: 0}
 --- !u!54 &2883900358275107100
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -38212,6 +38214,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!135 &7924620117036870708
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2883900358275107103}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2884082578401804649
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vuforia;
+using GameObject = UnityEngine.GameObject;
 using Random = UnityEngine.Random;
 
 public enum GestureType
@@ -53,6 +55,8 @@ public class MainGameManager : MonoBehaviour
 
     [SerializeField]
     int concurrentParticles = 20;
+
+    public GameObject target, zombie;
 
     [SerializeField]
     GameObject channelFireballParticlePrefab, fireballPrefab, channelFrostballParticlePrefab, frostballPrefab, channelGrassParticlePrefab, grassballPrefab;
@@ -134,7 +138,13 @@ public class MainGameManager : MonoBehaviour
     IEnumerator SpellEffect()
     {
         var spellPrefab = Instantiate(_currentSpell.spellPrefab);
+
+        if (target.GetComponent<TrackableBehaviour>().CurrentStatus == TrackableBehaviour.Status.TRACKED)
+        {
+            spellPrefab.transform.SetParent(zombie.transform,false);
+        }
         spellPrefab.transform.position = targetHand.transform.position;
+
         var shootingDirection = Quaternion.Euler(-45, 0, 0) * -targetHand.transform.up;
 
         spellPrefab.GetComponent<BallSpell>().Shoot(shootingDirection);
