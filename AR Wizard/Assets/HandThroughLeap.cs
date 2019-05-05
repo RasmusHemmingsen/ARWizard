@@ -17,8 +17,8 @@ public class HandThroughLeap : MonoBehaviour
 {
     public bool TrainData = false;
     public string TrainGestureName;
-    public string MlMethod = "mse";
-
+    public MlMethods MlMethod = MlMethods.mse;
+    
     private Controller _controller;
     private Frame _frame;
     private readonly List<string> _dataDescription = new List<string>();
@@ -33,6 +33,16 @@ public class HandThroughLeap : MonoBehaviour
     public delegate void PythonEvent(Gesture g);
     public static event PythonEvent HandGesturePercentageEvent;
 
+    public enum MlMethods
+    {
+        nc,
+        nsc,
+        svm,
+        bpp,
+        mse,
+        dnn,
+        nn
+    }
 
 
     // Start is called before the first frame update
@@ -81,8 +91,7 @@ public class HandThroughLeap : MonoBehaviour
         _counterWriteToCsv = 20;
 
         if (TrainData) return;
-
-        var response = await _client.PostAsync($"/features?method={MlMethod}", content);
+        var response = await _client.PostAsync($"/features?method={MlMethod.ToString()}", content);
         var result = await response.Content.ReadAsStringAsync();
         var gesture = JsonConvert.DeserializeObject<Gesture>(result);
 
