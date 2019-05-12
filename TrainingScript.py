@@ -6,8 +6,8 @@ from sklearn.metrics import accuracy_score
 import pickle
 
 def loadData():
-    X = pd.read_csv(r"AR Wizard\Assets\TrainingData\HandGestureData2.csv")
-    y = np.array([0]*131 + [1]*131 + [2]*125 + [3]*127)
+    X = pd.read_csv(r"AR Wizard\Assets\TrainingData\HandGestureData3.csv")
+    y = np.array([0]*131 + [1]*131 + [2]*125 + [3]*127 + [0]*393 + [1]*317 + [2]*448 + [3]*351)
 
     X_train, X_test, y_train, y_test = train_test_split(X.values, y, test_size=0.3, random_state=7)
 
@@ -29,7 +29,7 @@ nsc.fit(train_data, train_label)
 nn.fit(train_data, train_label)
 bpp.fit(train_data, train_label)
 mse.fit(train_data, train_label, epsilon=100)
-dnn.fit(train_data, train_label, epochs=2)
+dnn.fit(train_data, train_label, epochs=13)
 
 svmPredictions, svmConfidence = svm.predict(test_data)
 ncPredictions, ncConfidence = nc.predict(test_data)
@@ -55,7 +55,7 @@ print(f"bpp score: {bppScore*100}%")
 print(f"mse score: {mseScore*100}%")
 print(f"dnn score: {dnnScore*100}%")
 
-version = 1
+version = 4
 svm.save(version)
 nc.save(version)
 nsc.save(version)
