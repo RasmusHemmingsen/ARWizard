@@ -55,7 +55,7 @@ print(f"bpp score: {bppScore*100}%")
 print(f"mse score: {mseScore*100}%")
 print(f"dnn score: {dnnScore*100}%")
 
-version = 4
+version = 5
 svm.save(version)
 nc.save(version)
 nsc.save(version)
