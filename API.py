@@ -14,7 +14,7 @@ def loadData():
 
 #test_data = loadData()
 
-version = 4
+version = 7
 svm = SVM().load(version)
 nc = NC().load(version)
 nsc = NSC(0).load(version)

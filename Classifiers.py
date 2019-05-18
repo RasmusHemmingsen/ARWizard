@@ -5,6 +5,7 @@ from sklearn import svm
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import add_dummy_feature
 import tensorflow as tf
+from tensorflow.python import keras as k
 import pickle
 
 class ClassificationModel:
@@ -91,8 +92,8 @@ class NSC:
 
 # Support Vector Machine
 class SVM:
-    def __init__(self):
-        self.clf = svm.SVC(gamma='scale', decision_function_shape='ovo', probability=True)
+    def __init__(self, gamma='scale', decision_function_shape='ovo', kernel='rbf', C=1):
+        self.clf = svm.SVC(gamma=gamma, decision_function_shape=decision_function_shape, kernel=kernel, C=C, probability=True)
 
     def fit(self, train_data, train_lbls):
         self.clf.fit(train_data, train_lbls)
@@ -113,8 +114,8 @@ class SVM:
 
 #Nearest Neighbor
 class NN:
-    def __init__(self):
-        self.clf = KNeighborsClassifier(weights='distance', n_jobs=-1, n_neighbors=5)
+    def __init__(self, n_neighbors=5, algorithm='auto', weight='distance'):
+        self.clf = KNeighborsClassifier(weights='distance', n_jobs=-1, n_neighbors=n_neighbors, algorithm=algorithm)
 
     def fit(self, train_data, train_lbls):
         self.clf.fit(train_data, train_lbls)
@@ -135,11 +136,15 @@ class NN:
 
 # Back Propegation Perceptron
 class BP_Perceptron:
-    def __init__(self):
+    def __init__(self, eta_decay=0.01, eta=1, annealing=True, max_iter=1000):
         self.label_offset = 0
         self.W = np.zeros(1)
+        self.eta = eta
+        self.eta_decay = eta_decay
+        self.annealing = annealing
+        self.max_iter = max_iter
 
-    def fit(self, train_data, train_lbls, eta=1, eta_decay=0.01, max_iter=1000, annealing=True):
+    def fit(self, train_data, train_lbls):
         # Create set of training classes
         classes = np.unique(train_lbls)
         class_count = len(classes)
@@ -157,7 +162,7 @@ class BP_Perceptron:
         # Initialize labels for OVR (One vs Rest) binary classification
         ovr_lbls = np.where(train_lbls[np.newaxis, :] == classes[:, np.newaxis], 1, -1)
 
-        for t in range(max_iter):
+        for t in range(self.max_iter):
             # Evaluate perceptron criterion function
             F = np.multiply(ovr_lbls, np.dot(self.W, X))
 
@@ -173,13 +178,13 @@ class BP_Perceptron:
             delta = np.multiply(Chi,ovr_lbls).dot(X.transpose())
 
             # Exponential decay of epsilon
-            if annealing:
-                anneal = np.exp(-eta_decay*t)
+            if self.annealing:
+                anneal = np.exp(-self.eta_decay*t)
             else:
                 anneal = 1
 
             # Update W
-            self.W += eta*anneal*delta
+            self.W += self.eta*anneal*delta
 
         return self
 
@@ -195,11 +200,12 @@ class BP_Perceptron:
 
 # Mean-Square-Error Perceptron
 class MSE_Perceptron:
-    def __init__(self):
+    def __init__(self, epsilon=100):
         self.label_offset = 0
         self.W = np.zeros(1)
+        self.epsilon=epsilon
 
-    def fit(self, train_data, train_lbls, epsilon):
+    def fit(self, train_data, train_lbls):
         # Create set of training classes
         classes = np.unique(train_lbls)
 
@@ -211,7 +217,7 @@ class MSE_Perceptron:
         n_features, n_samples = X.shape
 
         # Calculate regularized pseudo-inverse of X
-        X_pinv = np.dot(np.linalg.inv(np.dot(X, X.transpose()) + epsilon * np.identity(n_features)), X)
+        X_pinv = np.dot(np.linalg.inv(np.dot(X, X.transpose()) + self.epsilon * np.identity(n_features)), X)
 
         # Initialize target matrix B for OVR (One vs Rest) binary classification
         B = np.where(train_lbls[np.newaxis, :] == classes[:, np.newaxis], 1, -1)
@@ -246,29 +252,31 @@ def perceptron_classify(W, test_data):
 
 #Deep neural network
 class DNN:
-    def __init__(self):
-        self.model = tf.keras.Sequential([
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(4560, activation='relu'),
-            tf.keras.layers.Dropout(0.1),
-            tf.keras.layers.Dense(2280, activation='relu'),
-            tf.keras.layers.Dropout(0.1),
-            tf.keras.layers.Dense(4560, activation='relu'),
-            tf.keras.layers.Dropout(0.1),
-            tf.keras.layers.Dense(2280, activation='relu'),
-            tf.keras.layers.Dropout(0.1),
-            tf.keras.layers.Dense(4560, activation='relu'),
-            tf.keras.layers.Dropout(0.1),
-            tf.keras.layers.Dense(4, activation='softmax')
+    def __init__(self, epochs=20, size=4560, dropout=0.1, learning_rate=1e-4):
+        self.epochs=epochs
+        self.model = k.Sequential([
+            k.layers.Flatten(),
+            k.layers.Dense(size, activation='relu'),
+            k.layers.Dropout(dropout),
+            k.layers.Dense(size, activation='relu'),
+            k.layers.Dropout(dropout),
+            k.layers.Dense(size, activation='relu'),
+            k.layers.Dropout(dropout),
+            k.layers.Dense(size, activation='relu'),
+            k.layers.Dropout(dropout),
+            k.layers.Dense(size, activation='relu'),
+            k.layers.Dropout(dropout),
+            k.layers.Dense(4, activation='softmax')
             ])
+        self.optimizer = k.optimizers.Adam(lr=learning_rate)
 
-
-    def fit(self, train_data, train_label, epochs):
-        self.model.compile(optimizer='adam',
+    def fit(self, train_data, train_label):
+        self.model.compile(optimizer=self.optimizer,
               loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+              metrics=['accuracy'],
+              kernel_initializer=k.initializers.RandomNormal(seed=1337))
 
-        self.model.fit(x=train_data, y=train_label, epochs=epochs)
+        self.model.fit(x=train_data, y=train_label, epochs=self.epochs)
         #self.model.summary()
 
     def predict(self, test_data):
@@ -282,5 +290,5 @@ class DNN:
         self.model.save(f"models/dnnv{version}.h5")
 
     def load(self, version):
-        self.model = tf.keras.models.load_model(f"models/dnnv{version}.h5")
+        self.model = k.models.load_model(f"models/dnnv{version}.h5")
         return self
