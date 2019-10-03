@@ -10,7 +10,8 @@ Through AR-Wizard the users will become powerful wizards fighting off invading z
 The spells will be conjured by the user correctly performing different hand gestures.
 Both augmented reality and machine learning are becoming more popular in the world as the potential in them are huge. This project's focus is to combine the two concepts.
 
-A video of the developed prototype can be seen here: 
+A video of the developed prototype can be seen here:
+ 
 [![Watch the video](https://img.youtube.com/vi/B8vyqE9z9oA/0.jpg)](https://youtu.be/B8vyqE9z9oA)
 
 
